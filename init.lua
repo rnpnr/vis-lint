@@ -1,6 +1,8 @@
 vis:command_register("lint", function()
 	local linters = {}
 	linters["bash"] = "shellcheck -"
+	linters["lua"] = "luacheck --exclude-files * --no-color -"
+	linters["man"] = "mandoc -T lint"
 
 	local cmd = linters[vis.win.syntax]
 	if cmd == nil then
