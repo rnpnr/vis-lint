@@ -1,6 +1,6 @@
 vis:command_register("lint", function()
 	local linters = {}
-	linters["bash"] = "shellcheck"
+	linters["bash"] = "shellcheck -"
 
 	local cmd = linters[vis.win.syntax]
 	if cmd == nil then
@@ -9,7 +9,8 @@ vis:command_register("lint", function()
 	end
 
 	local file = vis.win.file
-	local _, ostr, estr = vis:pipe(file, {start = 0, finish = 0}, cmd .. " " .. file.name)
+	local _, ostr, estr = vis:pipe(file, {start = 0, finish = file.size},
+	                               cmd .. " " .. file.name)
 	if estr then
 		vis:message(estr)
 		return false
