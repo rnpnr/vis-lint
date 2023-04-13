@@ -1,7 +1,7 @@
 vis:command_register("lint", function()
 	local linters = {}
 	linters["bash"] = "shellcheck -"
-	linters["lua"] = "luacheck --exclude-files * --no-color -"
+	linters["lua"] = "luacheck --no-color -"
 	linters["man"] = "mandoc -T lint"
 
 	local cmd = linters[vis.win.syntax]
@@ -11,8 +11,7 @@ vis:command_register("lint", function()
 	end
 
 	local file = vis.win.file
-	local _, ostr, estr = vis:pipe(file, {start = 0, finish = file.size},
-	                               cmd .. " " .. file.name)
+	local _, ostr, estr = vis:pipe(file, {start = 0, finish = file.size}, cmd)
 	if estr then
 		vis:message(estr)
 		return false
