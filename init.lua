@@ -4,10 +4,12 @@ linters["json"] = {"jq"}
 linters["lua"] = {"luacheck --no-color -"}
 linters["man"] = {"mandoc -T lint"}
 linters["python"] = {"ruff", "mypy --strict"}
+linters["rust"] = {"cargo check", "cargo clippy"}
 
 fixers = {}
 fixers["json"] = {"jq -c"}
 fixers["python"] = {"black", "isort", "ruff --fix"}
+fixers["rust"] = {"cargo fmt", "cargo clippy --fix"}
 
 -- Clear vis:message window before running?
 run_actions_on_file = function(action, actions, file)
