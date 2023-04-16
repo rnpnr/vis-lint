@@ -5,6 +5,10 @@ linters["lua"] = {"luacheck --no-color -"}
 linters["man"] = {"mandoc -T lint"}
 linters["python"] = {"ruff", "mypy --strict"}
 
+fixers = {}
+fixers["json"] = {"jq -c"}
+fixers["python"] = {"black", "isort", "ruff --fix"}
+
 -- Clear vis:message window before running?
 run_actions_on_file = function(action, actions, file)
 	local cmds = actions[vis.win.syntax]
@@ -33,3 +37,7 @@ end
 vis:command_register("lint", function(argv, force, win, selection, range)
 	return run_actions_on_file('linters', linters, win.file)
 end, "Lint the current file and display output in the message window")
+
+vis:command_register("fix", function(argv, force, win, selection, range)
+	return run_actions_on_file('fixers', fixers, win.file)
+end, "Fix the current file and display output in the message window. May modify file.")
