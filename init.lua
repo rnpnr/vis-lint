@@ -12,7 +12,7 @@ fixers["python"] = {"black", "isort", "ruff --fix"}
 fixers["rust"] = {"cargo fmt", "cargo clippy --fix"}
 
 -- Clear vis:message window before running?
-run_actions_on_file = function(action, actions, file)
+run_actions_on_file = function(action, actions, file, modify)
 	local cmds = actions[vis.win.syntax]
 	if cmds == nil or #cmds == 0 then
 		vis:info(action  .. " not defined for " .. vis.win.syntax)
@@ -25,7 +25,15 @@ run_actions_on_file = function(action, actions, file)
 		if ostr == nil and estr == nil then
 			vis:message("[no output]")
 		else
-			vis:message((ostr or "") .. (estr or ""))
+			if (modify and ostr) then
+				local pos = vis.win.selection.pos
+				file:delete(0, file.size)
+				file:insert(0, ostr)
+				vis.win.selection.pos = pos
+			else
+				vis:message(ostr or "")
+			end
+			vis:message(estr or "")
 		end
 		vis:message("\n")
 
@@ -37,9 +45,9 @@ run_actions_on_file = function(action, actions, file)
 end
 
 vis:command_register("lint", function(argv, force, win, selection, range)
-	return run_actions_on_file('linters', linters, win.file)
+	return run_actions_on_file('linters', linters, win.file, false)
 end, "Lint the current file and display output in the message window")
 
 vis:command_register("fix", function(argv, force, win, selection, range)
-	return run_actions_on_file('fixers', fixers, win.file)
-end, "Fix the current file and display output in the message window. May modify file.")
+	return run_actions_on_file('fixers', fixers, win.file, true)
+end, "Pipe the current file through defined fixers. Modifies the buffer.")
