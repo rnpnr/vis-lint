@@ -1,25 +1,17 @@
-linters = {}
-linters["bash"] = {"shellcheck -"}
-linters["json"] = {"jq"}
-linters["lua"] = {"luacheck --no-color -"}
-linters["man"] = {"mandoc -T lint"}
-linters["python"] = {
-	"black --check -",
-	"isort --check -",
-	"pylint --from-stdin stdin_from_vis",
-	"flake8 -",
-	"ruff -",
-	-- The shell must support process substitution
-	-- Try setting vis' shell to "sh" with "set shell sh"
-	-- https://github.com/python/mypy/issues/12235
-	"mypy <(cat)"
-}
-linters["rust"] = {"rustfmt --check", "clippy-driver -"}
+local lint = {}
 
-fixers = {}
-fixers["json"] = {"jq -c"}
-fixers["python"] = {"black -", "isort -", "ruff --fix -"}
-fixers["rust"] = {"rustfmt"}
+lint.linters = {}
+lint.linters["bash"] = {"shellcheck -"}
+lint.linters["json"] = {"jq"}
+lint.linters["lua"] = {"luacheck --no-color -"}
+lint.linters["man"] = {"mandoc -T lint"}
+lint.linters["python"] = {"black --check -", "isort --check -"}
+lint.linters["rust"] = {"rustfmt --check", "clippy-driver -"}
+
+lint.fixers = {}
+lint.fixers["json"] = {"jq -c"}
+lint.fixers["python"] = {"black -", "isort -"}
+lint.fixers["rust"] = {"rustfmt"}
 
 -- Clear vis:message window before running?
 run_actions_on_file = function(action, actions, file, modify)
@@ -69,9 +61,11 @@ run_actions_on_file = function(action, actions, file, modify)
 end
 
 vis:command_register("lint", function(argv, force, win, selection, range)
-	return run_actions_on_file('linters', linters, win.file, false)
+	return run_actions_on_file("linters", lint.linters, win.file, false)
 end, "Lint the current file and display output in the message window")
 
 vis:command_register("fix", function(argv, force, win, selection, range)
-	return run_actions_on_file('fixers', fixers, win.file, true)
+	return run_actions_on_file("fixers", lint.fixers, win.file, true)
 end, "Pipe the current file through defined fixers. Modifies the buffer.")
+
+return lint
