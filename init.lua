@@ -18,11 +18,11 @@ run_actions_on_file = function(action, actions, file, modify)
 	local cmds = actions[vis.win.syntax]
 	if cmds == nil or #cmds == 0 then
 		vis:info(action
-			.. " not defined for vis.win.syntax="
+			.. " not defined for vis.win.syntax = "
 			.. (vis.win.syntax or "undefined")
 			.. " in file "
 			.. (file.name or "unnamed file"))
-		return false
+		return
 	end
 	-- Print this for clarity and separate different outputs in the vis:message buffer
 	local header = "--- " .. action .. ": "
