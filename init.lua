@@ -3,13 +3,23 @@ linters["bash"] = {"shellcheck -"}
 linters["json"] = {"jq"}
 linters["lua"] = {"luacheck --no-color -"}
 linters["man"] = {"mandoc -T lint"}
-linters["python"] = {"ruff", "mypy --strict"}
-linters["rust"] = {"cargo check", "cargo clippy"}
+linters["python"] = {
+	"black --check -",
+	"isort --check -",
+	"pylint --from-stdin stdin_from_vis",
+	"flake8 -",
+	"ruff -",
+	-- The shell must support process substitution
+	-- Try setting vis' shell to "sh" with "set shell sh"
+	-- https://github.com/python/mypy/issues/12235
+	"mypy <(cat)"
+}
+linters["rust"] = {"rustfmt --check", "clippy-driver -"}
 
 fixers = {}
 fixers["json"] = {"jq -c"}
-fixers["python"] = {"black", "isort", "ruff --fix"}
-fixers["rust"] = {"cargo fmt", "cargo clippy --fix"}
+fixers["python"] = {"black -", "isort -", "ruff --fix -"}
+fixers["rust"] = {"rustfmt"}
 
 -- Clear vis:message window before running?
 run_actions_on_file = function(action, actions, file, modify)
