@@ -60,12 +60,20 @@ run_actions_on_file = function(action, actions, file, modify)
 	return all_succeeded
 end
 
+lint.lint = function(file)
+	return run_actions_on_file("linter", lint.linters, file, false)
+end
+
+lint.fix = function(file)
+	return run_actions_on_file("fixer", lint.fixers, file, true)
+end
+
 vis:command_register("lint", function(argv, force, win, selection, range)
-	return run_actions_on_file("linters", lint.linters, win.file, false)
+	return lint.lint(win.file)
 end, "Lint the current file and display output in the message window")
 
 vis:command_register("fix", function(argv, force, win, selection, range)
-	return run_actions_on_file("fixers", lint.fixers, win.file, true)
+	return lint.fix(win.file)
 end, "Pipe the current file through defined fixers. Modifies the buffer.")
 
 return lint

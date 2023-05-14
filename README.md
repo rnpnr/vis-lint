@@ -50,3 +50,11 @@ A new filetype can be added as follows (`awkfix` is a hypothetical
 	lint.fixers["awk"] = { "awkfix" }
 
 Note: if a default doesn't exist feel free to submit a patch adding it!
+
+### Running Fixers Before Writing
+
+The fixers can be run before saving a file using Vis' events:
+
+	vis.events.subscribe(vis.events.FILE_SAVE_PRE, lint.fix)
+
+Note that if any fixer fails the file won't save (unless `:w!` was used).
