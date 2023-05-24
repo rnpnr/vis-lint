@@ -15,7 +15,16 @@ wiki for further details.
 
 ## Usage
 
-Type the following into the Vis command prompt:
+The following functions and commands are exported:
+
+| Name    | Description                        |
+|---------|------------------------------------|
+| `lint`  | Run to lint the current file       |
+| `fix`   | Run to fix the current file        |
+| `.lint` | `lint` command accessible from Lua |
+| `.fix`  | `fix` command accessible from Lua  |
+
+For example type the following into the Vis command prompt:
 
 	:lint
 
