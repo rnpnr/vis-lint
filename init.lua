@@ -41,25 +41,25 @@ local run_actions_on_file = function(action, actions, file, modify)
 			.. (file.name or "unnamed file"))
 		return
 	end
-	-- Print this for clarity and separate different outputs in the vis:message buffer
-	local header = "--- " .. action .. ": "
-	vis:message(header .. "running " .. action .. " (" .. os.date() .. ")")
+	-- print this to separate different outputs in the message buffer
+	local prefix = "--- vis-lint: "
+	vis:message(prefix .. "running " .. action .. " (" .. os.date() .. ")")
 	local all_succeeded = true
 	for _, cmd in ipairs(cmds) do
-		vis:message(header .. "piping "
-			.. (file.name or "unnamed file")
+		vis:message(prefix .. "piping "
+			.. (file.name or "buffer")
 			.. " to `" .. cmd .. "`")
 		local ret = run_on_file(cmd, file, modify)
 		if ret ~= 0 then
 			all_succeeded = false
-			-- Exit early if any fixer fails as indicated by the exit status
+			-- exit early if modify was specified
 			if modify then
 				vis:message("Command failed with exit code: " .. ret)
 				return false
 			end
 		end
 	end
-	vis:message(header .. "done")
+	vis:message(prefix .. "done")
 	return all_succeeded
 end
 
