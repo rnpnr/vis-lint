@@ -13,8 +13,25 @@ lint.fixers["json"] = {"jq -c"}
 lint.fixers["python"] = {"black -", "isort -"}
 lint.fixers["rust"] = {"rustfmt"}
 
+local run_on_file = function(cmd, file, modify)
+	local ret, ostr, estr = vis:pipe(file, {start = 0, finish = file.size}, cmd)
+	if ostr ~= nil or estr ~= nil then
+		if (modify and ostr) then
+			local pos = vis.win.selection.pos
+			file:delete(0, file.size)
+			file:insert(0, ostr)
+			vis.win.selection.pos = pos
+		else
+			if ostr then vis:message(ostr) end
+		end
+		if estr then vis:message(estr) end
+		vis:redraw()
+	end
+	return ret
+end
+
 -- Clear vis:message window before running?
-run_actions_on_file = function(action, actions, file, modify)
+local run_actions_on_file = function(action, actions, file, modify)
 	local cmds = actions[vis.win.syntax]
 	if cmds == nil or #cmds == 0 then
 		vis:info(action
@@ -28,30 +45,16 @@ run_actions_on_file = function(action, actions, file, modify)
 	local header = "--- " .. action .. ": "
 	vis:message(header .. "running " .. action .. " (" .. os.date() .. ")")
 	local all_succeeded = true
-	for i, cmd in ipairs(cmds) do
+	for _, cmd in ipairs(cmds) do
 		vis:message(header .. "piping "
 			.. (file.name or "unnamed file")
 			.. " to `" .. cmd .. "`")
-		local status, ostr, estr = vis:pipe(file, {start = 0, finish = file.size}, cmd)
-
-		if ostr ~= nil or estr ~= nil then
-			if (modify and ostr) then
-				local pos = vis.win.selection.pos
-				file:delete(0, file.size)
-				file:insert(0, ostr)
-				vis.win.selection.pos = pos
-			else
-				if ostr then vis:message(ostr) end
-			end
-			if estr then vis:message(estr) end
-			vis:redraw()
-		end
-
-		if status then
+		local ret = run_on_file(cmd, file, modify)
+		if ret ~= 0 then
 			all_succeeded = false
 			-- Exit early if any fixer fails as indicated by the exit status
 			if modify then
-				vis:message("Fixer failed with status code " .. status)
+				vis:message("Command failed with exit code: " .. ret)
 				return false
 			end
 		end
