@@ -34,23 +34,21 @@ local run_on_file = function(cmd, file, range, modify)
 end
 
 -- Clear vis:message window before running?
-local run_actions_on_file = function(action, actions, file, range, modify)
+local run_actions_on_file = function(actions, file, range, modify)
 	local cmds = actions[vis.win.syntax]
 	if cmds == nil or #cmds == 0 then
-		vis:info(action
-			.. " not defined for vis.win.syntax = "
-			.. (vis.win.syntax or "undefined")
-			.. " in file "
-			.. (file.name or "unnamed file"))
+		vis:info("vis-lint: action not defined for vis.win.syntax = "
+			.. (vis.win.syntax or "undefined"))
 		return
 	end
 	-- print this to separate different outputs in the message buffer
-	local prefix = "--- vis-lint: "
-	vis:message(prefix .. "running " .. action .. " (" .. os.date() .. ")")
+	local prefix = "--- "
+	vis:message(prefix .. "vis-lint: (" .. os.date() .. ")")
 	local all_succeeded = true
 	for _, cmd in ipairs(cmds) do
 		vis:message(prefix .. "piping "
 			.. (file.name or "buffer")
+			.. (range and "<" .. range.start ..  "," .. range.finish .. ">" or "")
 			.. " to `" .. cmd .. "`")
 		local ret = run_on_file(cmd, file, range, modify)
 		if ret ~= 0 then
@@ -67,11 +65,11 @@ local run_actions_on_file = function(action, actions, file, range, modify)
 end
 
 lint.lint = function(file, range)
-	return run_actions_on_file("linter", lint.linters, file, range)
+	return run_actions_on_file(lint.linters, file, range)
 end
 
 lint.fix = function(file, range)
-	return run_actions_on_file("fixer", lint.fixers, file, range, true)
+	return run_actions_on_file(lint.fixers, file, range, true)
 end
 
 vis:command_register("lint", function(argv, force, win, selection, range)
