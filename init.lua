@@ -13,13 +13,16 @@ lint.fixers["json"] = {"jq -c"}
 lint.fixers["python"] = {"black -", "isort -"}
 lint.fixers["rust"] = {"rustfmt"}
 
-local run_on_file = function(cmd, file, modify)
-	local ret, ostr, estr = vis:pipe(file, {start = 0, finish = file.size}, cmd)
+local run_on_file = function(cmd, file, range, modify)
+	if range == nil or range.finish - range.finish <= 1 then
+		range = {start = 0, finish = file.size}
+	end
+	local ret, ostr, estr = vis:pipe(file, range, cmd)
 	if ostr ~= nil or estr ~= nil then
 		if (modify and ostr) then
 			local pos = vis.win.selection.pos
-			file:delete(0, file.size)
-			file:insert(0, ostr)
+			file:delete(range.start, range.finish)
+			file:insert(range.start, ostr)
 			vis.win.selection.pos = pos
 		else
 			if ostr then vis:message(ostr) end
@@ -31,7 +34,7 @@ local run_on_file = function(cmd, file, modify)
 end
 
 -- Clear vis:message window before running?
-local run_actions_on_file = function(action, actions, file, modify)
+local run_actions_on_file = function(action, actions, file, range, modify)
 	local cmds = actions[vis.win.syntax]
 	if cmds == nil or #cmds == 0 then
 		vis:info(action
@@ -49,7 +52,7 @@ local run_actions_on_file = function(action, actions, file, modify)
 		vis:message(prefix .. "piping "
 			.. (file.name or "buffer")
 			.. " to `" .. cmd .. "`")
-		local ret = run_on_file(cmd, file, modify)
+		local ret = run_on_file(cmd, file, range, modify)
 		if ret ~= 0 then
 			all_succeeded = false
 			-- exit early if modify was specified
@@ -63,20 +66,20 @@ local run_actions_on_file = function(action, actions, file, modify)
 	return all_succeeded
 end
 
-lint.lint = function(file)
-	return run_actions_on_file("linter", lint.linters, file, false)
+lint.lint = function(file, range)
+	return run_actions_on_file("linter", lint.linters, file, range)
 end
 
-lint.fix = function(file)
-	return run_actions_on_file("fixer", lint.fixers, file, true)
+lint.fix = function(file, range)
+	return run_actions_on_file("fixer", lint.fixers, file, range, true)
 end
 
 vis:command_register("lint", function(argv, force, win, selection, range)
-	return lint.lint(win.file)
+	return lint.lint(win.file, range)
 end, "Lint the current file and display output in the message window")
 
 vis:command_register("fix", function(argv, force, win, selection, range)
-	return lint.fix(win.file)
+	return lint.fix(win.file, range)
 end, "Pipe the current file through defined fixers. Modifies the buffer.")
 
 return lint
