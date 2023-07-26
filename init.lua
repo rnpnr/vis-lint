@@ -13,6 +13,19 @@ lint.fixers["json"] = {"jq -c"}
 lint.fixers["python"] = {"black -", "isort -"}
 lint.fixers["rust"] = {"rustfmt"}
 
+lint.log = {}
+lint.log.INFO = 1
+lint.log.ERROR = 2
+lint.log.OUTPUT = 3
+
+lint.logger = function(str, level)
+	if level == lint.log.INFO then
+		vis:info(str)
+	else
+		vis:message(str)
+	end
+end
+
 local run_on_file = function(cmd, file, range, modify)
 	if range == nil or range.finish - range.finish <= 1 then
 		range = {start = 0, finish = file.size}
@@ -25,28 +38,27 @@ local run_on_file = function(cmd, file, range, modify)
 			file:insert(range.start, ostr)
 			vis.win.selection.pos = pos
 		else
-			if ostr then vis:message(ostr) end
+			if ostr then lint.logger(ostr, lint.log.OUTPUT) end
 		end
-		if estr then vis:message(estr) end
+		if estr then lint.logger(estr, lint.log.ERROR) end
 		vis:redraw()
 	end
 	return ret
 end
 
--- Clear vis:message window before running?
 local run_actions_on_file = function(actions, file, range, modify)
 	local cmds = actions[vis.win.syntax]
 	if cmds == nil or #cmds == 0 then
-		vis:info("vis-lint: action not defined for vis.win.syntax = "
-			.. (vis.win.syntax or "undefined"))
+		lint.logger("vis-lint: action not defined for vis.win.syntax = "
+			.. (vis.win.syntax or "undefined"), lint.log.INFO)
 		return
 	end
 	-- print this to separate different outputs in the message buffer
 	local prefix = "--- "
-	vis:message(prefix .. "vis-lint: (" .. os.date() .. ")")
+	lint.logger(prefix .. "vis-lint: (" .. os.date() .. ")")
 	local all_succeeded = true
 	for _, cmd in ipairs(cmds) do
-		vis:message(prefix .. "piping "
+		lint.logger(prefix .. "piping "
 			.. (file.name or "buffer")
 			.. (range and "<" .. range.start ..  "," .. range.finish .. ">" or "")
 			.. " to `" .. cmd .. "`")
@@ -55,12 +67,12 @@ local run_actions_on_file = function(actions, file, range, modify)
 			all_succeeded = false
 			-- exit early if modify was specified
 			if modify then
-				vis:message("Command failed with exit code: " .. ret)
+				lint.logger("Command failed with exit code: " .. ret, lint.log.ERROR)
 				return false
 			end
 		end
 	end
-	vis:message(prefix .. "done")
+	lint.logger(prefix .. "done")
 	return all_succeeded
 end
 
