@@ -17,12 +17,12 @@ wiki for further details.
 
 The following functions and commands are exported:
 
-| Name    | Description                        |
-|---------|------------------------------------|
-| `lint`  | Run to lint the current file       |
-| `fix`   | Run to fix the current file        |
-| `.lint` | `lint` command accessible from Lua |
-| `.fix`  | `fix` command accessible from Lua  |
+| Name                 | Description                                      |
+|----------------------|--------------------------------------------------|
+| `lint`               | Run to lint the current file (range if selected) |
+| `fix`                | Run to fix the current file (range if selected)  |
+| `.lint(file, range)` | `lint` command accessible from Lua               |
+| `.fix(file, range)`  | `fix` command accessible from Lua                |
 
 For example type the following into the Vis command prompt:
 
@@ -67,3 +67,20 @@ The fixers can be run before saving a file using Vis' events:
 	vis.events.subscribe(vis.events.FILE_SAVE_PRE, lint.fix)
 
 Note that if any fixer fails the file won't save (unless `:w!` was used).
+
+### Silencing Logging Or Logging To File
+
+The logging function is stored as a configuration variable and can be
+modified as follows:
+
+	lint.logger = function(str, level)
+		if level == lint.log.INFO then
+			vis:info(str)
+		else
+			local fp = io.open("log.txt", "a")
+			fp:write(str .. "\n")
+			fp:close()
+		end
+	end
+
+The sent message levels are `INFO`, `OUTPUT`, and `ERROR`.
