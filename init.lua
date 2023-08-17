@@ -27,7 +27,7 @@ lint.logger = function(str, level)
 end
 
 local run_on_file = function(cmd, file, range, modify)
-	if range == nil or range.finish - range.finish <= 1 then
+	if range == nil or range.finish - range.start <= 1 then
 		range = {start = 0, finish = file.size}
 	end
 	local ret, ostr, estr = vis:pipe(file, range, cmd)
