@@ -9,7 +9,7 @@ lint.linters["python"] = {"black --check -", "isort --check -"}
 lint.linters["rust"] = {"rustfmt --check", "clippy-driver -"}
 
 lint.fixers = {}
-lint.fixers["json"] = {"jq -c"}
+lint.fixers["json"] = {"jq"}
 lint.fixers["python"] = {"black -", "isort -"}
 lint.fixers["rust"] = {"rustfmt"}
 
