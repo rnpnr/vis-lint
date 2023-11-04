@@ -36,10 +36,12 @@ Additional tools for fixing and linting can be added as follows:
 
 	local lint = require("plugins/vis-lint")
 	table.insert(lint.linters["python"], "pylint --from-stdin stdin_from_vis")
+	table.insert(lint.linters["python"], "mypy /dev/stdin")
 
-Note: any added tools must read/write from `stdin`/`stdout`. Some
-programs, like the above example, may need some non standard flags. You
-can also try using `-` or `/dev/stdin` as the input parameter.
+#### Tools must read from `stdin` and output to `stdout`!
+
+Some programs, like the above examples, may need some non standard flags.
+You can also try using `-` or `/dev/stdin` as the input parameter.
 
 ### Overriding The Defaults
 
