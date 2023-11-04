@@ -57,6 +57,7 @@ local run_actions_on_file = function(actions, file, range, modify)
 	local prefix = "--- "
 	lint.logger(prefix .. "vis-lint: (" .. os.date() .. ")")
 	local all_succeeded = true
+	local failure_count = 0
 	for _, cmd in ipairs(cmds) do
 		lint.logger(prefix .. "piping "
 			.. (file.name or "buffer")
@@ -65,6 +66,7 @@ local run_actions_on_file = function(actions, file, range, modify)
 		local ret = run_on_file(cmd, file, range, modify)
 		if ret ~= 0 then
 			all_succeeded = false
+			failure_count = failure_count + 1
 			-- exit early if modify was specified
 			if modify then
 				lint.logger("Command failed with exit code: " .. ret, lint.log.ERROR)
@@ -72,7 +74,7 @@ local run_actions_on_file = function(actions, file, range, modify)
 			end
 		end
 	end
-	lint.logger(prefix .. "done")
+	lint.logger(prefix .. #cmds .. " commands done, " .. failure_count .. " reported a problem")
 	return all_succeeded
 end
 
