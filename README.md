@@ -77,7 +77,7 @@ modified as follows:
 		if level == lint.log.INFO then
 			vis:info(str)
 		else
-			local fp = io.open("log.txt", "a")
+			local fp = io.open("log.txt", "*a")
 			fp:write(str .. "\n")
 			fp:close()
 		end
