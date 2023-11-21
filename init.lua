@@ -5,11 +5,13 @@ lint.linters["bash"] = {"shellcheck -"}
 lint.linters["json"] = {"jq"}
 lint.linters["lua"] = {"luacheck --no-color -"}
 lint.linters["man"] = {"mandoc -T lint"}
+lint.linters["meson"] = {"muon analyze"}
 lint.linters["python"] = {"black --check -", "isort --check -"}
 lint.linters["rust"] = {"rustfmt --check", "clippy-driver -"}
 
 lint.fixers = {}
 lint.fixers["json"] = {"jq"}
+lint.fixers["meson"] = {"muon fmt"}
 lint.fixers["python"] = {"black -", "isort -"}
 lint.fixers["rust"] = {"rustfmt"}
 
