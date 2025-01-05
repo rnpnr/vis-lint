@@ -1,23 +1,23 @@
 local lint = {}
 
 lint.linters = {}
-lint.linters["bash"] = {"shellcheck -"}
-lint.linters["json"] = {"jq"}
-lint.linters["lua"] = {"luacheck --no-color -"}
-lint.linters["man"] = {"mandoc -T lint"}
-lint.linters["meson"] = {"muon check -"}
+lint.linters["bash"]   = {"shellcheck -"}
+lint.linters["json"]   = {"jq"}
+lint.linters["lua"]    = {"luacheck --no-color -"}
+lint.linters["man"]    = {"mandoc -T lint"}
+lint.linters["meson"]  = {"muon check -"}
 lint.linters["python"] = {"black --quiet --check -", "isort --check -"}
-lint.linters["rust"] = {"rustfmt --check", "clippy-driver -"}
+lint.linters["rust"]   = {"rustfmt --check", "clippy-driver -"}
 
 lint.fixers = {}
-lint.fixers["json"] = {"jq"}
-lint.fixers["meson"] = {"muon fmt -"}
-lint.fixers["python"] = {"black -", "isort -"}
-lint.fixers["rust"] = {"rustfmt"}
+lint.fixers["json"]    = {"jq"}
+lint.fixers["meson"]   = {"muon fmt -"}
+lint.fixers["python"]  = {"black -", "isort -"}
+lint.fixers["rust"]    = {"rustfmt"}
 
 lint.log = {}
-lint.log.INFO = 1
-lint.log.ERROR = 2
+lint.log.INFO   = 1
+lint.log.ERROR  = 2
 lint.log.OUTPUT = 3
 
 lint.logger = function(str, level)
