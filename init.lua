@@ -1,3 +1,4 @@
+-- See LICENSE for copyright details
 local lint = {}
 
 lint.linters = {}
@@ -10,6 +11,8 @@ lint.linters["python"] = {"black --quiet --check -", "isort --check -"}
 lint.linters["rust"]   = {"rustfmt --check", "clippy-driver -"}
 
 lint.fixers = {}
+lint.fixers["c"]       = {"clang-format -fallback-style=none"}
+lint.fixers["cpp"]     = {"clang-format -fallback-style=none"}
 lint.fixers["json"]    = {"jq"}
 lint.fixers["meson"]   = {"muon fmt -"}
 lint.fixers["python"]  = {"black -", "isort -"}
